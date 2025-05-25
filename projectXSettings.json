@@ -1,0 +1,38 @@
+{
+  "projectName": "TensorArt Playwright Automation",
+  "description": "Automated end-to-end testing of tensor.art using Playwright for .NET with OpenAI-powered components.",
+  "testFramework": "Playwright.NET",
+  "openAI": {
+    "enabled": true,
+    "model": "gpt-3.5-turbo",
+    "apiKey": "sk-abc123fakekey",
+    "components": [
+      "summarizer",
+      "assertionGenerator"
+    ],
+    "maxTokens": 512
+  },
+  "testTargets": [
+    "https://tensor.art/login",
+    "https://tensor.art/explore",
+    "https://tensor.art/upload"
+  ],
+  "testUsers": [
+    {
+      "username": "testuser01",
+      "password": "Pa$$w0rd!"
+    },
+    {
+      "username": "demo_user",
+      "password": "Qwerty123!"
+    }
+  ],
+  "notification": {
+    "discordWebhookUrl": "https://discord.com/api/webhooks/123456789012345678/abcdefghijklmnopqrstuvwxyz",
+    "onTestFailure": true
+  },
+  "reporting": {
+    "outputDirectory": "TestResults",
+    "format": "html"
+  }
+}
