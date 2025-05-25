@@ -9,6 +9,8 @@
 .vscode/
 .idea/
 
+**/.vs/
+
 # Ignore build output for all subprojects
 TensorArtPlayWrightDotNet/**/bin/
 TensorArtPlayWrightDotNet/**/obj/
