@@ -1,0 +1,37 @@
+/TensorArtPlayWrightDotNet/TensorArtPlayWrightDotNet/bin
+
+
+# Ignore Visual Studio + Rider files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+.idea/
+
+# Ignore build output for all subprojects
+TensorArtPlayWrightDotNet/**/bin/
+TensorArtPlayWrightDotNet/**/obj/
+
+# Playwright browser cache
+TensorArtPlayWrightDotNet/**/ms-playwright/
+
+# Playwright test output
+TensorArtPlayWrightDotNet/**/playwright-report/
+TensorArtPlayWrightDotNet/**/test-results/
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+
+# System junk
+.DS_Store
+Thumbs.db
+
+# Secrets (adjust if used)
+TensorArtPlayWrightDotNet/**/secrets.json
+TensorArtPlayWrightDotNet/**/appsettings.*.local.json
+
+# Node modules (if you use any frontend tools)
+TensorArtPlayWrightDotNet/**/node_modules/
