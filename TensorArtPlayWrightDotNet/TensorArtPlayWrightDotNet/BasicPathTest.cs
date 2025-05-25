@@ -1,3 +1,6 @@
+using DiscordChannelReader;
+using DiscordChannelReader.Utils;
+
 namespace TensorArtPlayWrightDotNet
 {
     [Parallelizable(ParallelScope.Self)]
@@ -5,24 +8,38 @@ namespace TensorArtPlayWrightDotNet
     public class Tests : PageTest
     {
         [Test]
-        public async Task HomepageHasPlaywrightInTitleAndGetStartedLinkLinkingtoTheIntroPage()
+        public async Task HomepageHasPlaywrightInTitleAndGetStartedLinkLinkingToTheIntroPage()
         {
-            await Page.GotoAsync("https://playwright.dev");
+            // Arrange
+            var url = "https://playwright.dev";
+            var expectedTitlePattern = new Regex("Playwright");
+            var expectedHref = "/docs/intro";
+            var expectedUrlPattern = new Regex(".*intro");
 
-            // Expect a title "to contain" a substring.
-            await Expect(Page).ToHaveTitleAsync(new Regex("Playwright"));
-
-            // create a locator
+            // Act
+            await Page.GotoAsync(url);
             var getStarted = Page.Locator("text=Get Started");
-
-            // Expect an attribute "to be strictly equal" to the value.
-            await Expect(getStarted).ToHaveAttributeAsync("href", "/docs/intro");
-
-            // Click the get started link.
             await getStarted.ClickAsync();
 
-            // Expects the URL to contain intro.
-            await Expect(Page).ToHaveURLAsync(new Regex(".*intro"));
+            // Assert
+            await Expect(Page).ToHaveTitleAsync(expectedTitlePattern);
+            await Expect(getStarted).ToHaveAttributeAsync("href", expectedHref);
+            await Expect(Page).ToHaveURLAsync(expectedUrlPattern);
+        }
+
+
+        [Test]
+        public async Task DiscordClient_ShouldLoadChannels()
+        {
+            // Arrange
+            var testDiscordChannelReader = new DiscordReader();
+
+            // Act
+            var collectedChannels = await testDiscordChannelReader.ListAllChannelsAsync();
+
+            // Assert
+            Assert.IsNotNull(collectedChannels, "The returned channel list should not be null.");
+            Assert.IsNotEmpty(collectedChannels, "At least one channel should be loaded from the Discord client.");
         }
     }
 }
