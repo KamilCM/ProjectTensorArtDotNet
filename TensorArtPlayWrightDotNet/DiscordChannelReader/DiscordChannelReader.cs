@@ -17,6 +17,19 @@ public class DiscordReader : IChannelReader
         _token = TokenObfuscator.Decrypt(config.EncryptedToken);
     }
 
+    private bool IsAudioAttachment(Attachment attachment)
+    {
+        if(attachment == null)
+            return false;
+        var audioExtensions = new[] { ".mp3", ".wav", ".ogg", ".m4a", ".flac" };
+        var isAudio = audioExtensions.Any(ext => attachment.Filename.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
+
+        if (!string.IsNullOrEmpty(attachment.ContentType))
+            isAudio |= attachment.ContentType.StartsWith("audio/", StringComparison.OrdinalIgnoreCase);
+
+        return isAudio;
+    }
+
     public async Task ReadLatestMessagesAsync(ulong channelId, int limit = 10)
     {
         await _client.LoginAsync(TokenType.Bot, _token);
@@ -60,5 +73,53 @@ public class DiscordReader : IChannelReader
         await _client.StopAsync();
         return result;
     }
+
+    public async Task<List<(string ChannelName, string FileName, string Url, string ContentType)>> ListRecentAudioAttachmentsAsync(string? channelNameFilter = null)
+    {
+        var attachments = new List<(string ChannelName, string FileName, string Url, string ContentType)>();
+        var cutoff = DateTimeOffset.UtcNow.AddDays(-14);
+
+        await _client.LoginAsync(TokenType.Bot, _token);
+        await _client.StartAsync();
+        await Task.Delay(3000); // Wait for ready
+
+        foreach (var guild in _client.Guilds)
+        {
+            foreach (var channel in guild.TextChannels)
+            {
+                if (!string.IsNullOrWhiteSpace(channelNameFilter) &&
+                    !channel.Name.Equals(channelNameFilter, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var messages = await channel.GetMessagesAsync(100).FlattenAsync();
+
+                    foreach (var msg in messages)
+                    {
+                        if (msg.Timestamp < cutoff) continue;
+
+                        foreach (var attachment in msg.Attachments)
+                        {
+                            if (IsAudioAttachment(attachment as Attachment))
+                            {
+                                attachments.Add((channel.Name, attachment.Filename, attachment.Url, attachment.ContentType ?? "unknown"));
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error accessing channel {channel.Name}: {ex.Message}");
+                }
+            }
+        }
+
+        await _client.StopAsync();
+        return attachments;
+    }
+
 
 }

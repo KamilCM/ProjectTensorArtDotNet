@@ -41,5 +41,19 @@ namespace TensorArtPlayWrightDotNet
             Assert.IsNotNull(collectedChannels, "The returned channel list should not be null.");
             Assert.IsNotEmpty(collectedChannels, "At least one channel should be loaded from the Discord client.");
         }
+
+        [Test]
+        public async Task DiscordClient_ShouldLoadVoiceRecordings()
+        {
+            // Arrange
+            var testDiscordChannelReader = new DiscordReader();
+
+            // Act
+            var collectedAudioAttachments = await testDiscordChannelReader.ListRecentAudioAttachmentsAsync();
+
+            // Assert
+            Assert.IsNotNull(collectedAudioAttachments, "The returned channel list should not be null.");
+            Assert.IsNotEmpty(collectedAudioAttachments, "At least one channel should be loaded from the Discord client.");
+        }
     }
 }
