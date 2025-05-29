@@ -121,5 +121,58 @@ public class DiscordReader : IChannelReader
         return attachments;
     }
 
+    public async Task DownloadRecentAudioAttachmentsAsync(string targetRootDir, string? channelNameFilter = null)
+    {
+        var saver = new AudioFileSaver(targetRootDir);
+        // extract to config in future
+        var cutoff = DateTimeOffset.UtcNow.AddDays(-14);
+
+        await _client.LoginAsync(TokenType.Bot, _token);
+        await _client.StartAsync();
+        await Task.Delay(3000); // wait for ready
+
+        foreach (var guild in _client.Guilds)
+        {
+            foreach (var channel in guild.TextChannels)
+            {
+                if (!string.IsNullOrWhiteSpace(channelNameFilter) &&
+                    !channel.Name.Equals(channelNameFilter, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var messages = await channel.GetMessagesAsync(100).FlattenAsync();
+                    foreach (var msg in messages)
+                    {
+                        if (msg.Timestamp < cutoff) continue;
+
+                        foreach (var attachment in msg.Attachments)
+                        {
+                            if (IsAudioAttachment(attachment as Attachment))
+                            {
+                                await saver.SaveAudioAsync(
+                                    guild.Name,
+                                    channel.Name,
+                                    $"{msg.Id}_{attachment.Filename}", // Add message ID prefix
+                                    attachment.Url
+                                );
+
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in {channel.Name}: {ex.Message}");
+                }
+            }
+        }
+
+        await _client.StopAsync();
+    }
+
+
 
 }

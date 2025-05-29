@@ -8,6 +8,7 @@
 *.sln.docstates
 .vscode/
 .idea/
+.vs/
 
 **/.vs/
 
