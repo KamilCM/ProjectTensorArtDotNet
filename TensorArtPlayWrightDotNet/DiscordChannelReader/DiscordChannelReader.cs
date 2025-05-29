@@ -172,7 +172,4 @@ public class DiscordReader : IChannelReader
 
         await _client.StopAsync();
     }
-
-
-
 }
