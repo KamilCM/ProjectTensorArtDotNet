@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using DiscordChannelReader.Utils;
+using System.Text.Json;
 
 namespace DiscordChannelReader.Config;
 
@@ -6,6 +7,8 @@ public class DiscordConfigMayh
 {
     public string EncryptedToken { get; set; } = "";
     public string TargetRootPath { get; set; } = "";
+    public string EncryptedOpenAiKey { get; set; } = "";
+    public string OpenAiKey => TokenObfuscator.Decrypt(EncryptedOpenAiKey);
 
     public static DiscordConfigMayh Load(string path)
     {
